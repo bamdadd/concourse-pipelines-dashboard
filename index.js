@@ -6,7 +6,7 @@ var _ = require('lodash');
 
 var app = express();
 
-app.set('port', (process.env.PORT || 8080));
+app.set('port', (process.env.PORT || 8099));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'pug');
 app.use(express.static(__dirname + '/resources'));
@@ -39,10 +39,6 @@ get_pipeline_statuses = () => {
 	for (pipeline of pipelines) {
 		request({
 			url: config.concourse_url + config.api_subdirectory + pipeline.url + "/jobs",
-			auth: {
-				username: config.concourse_username,
-				password: config.concourse_password
-			},
 			json: true,
 			strictSSL: false
 		}, (error, response, body) => {
