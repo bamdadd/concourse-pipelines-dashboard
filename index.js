@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 
 var pipelines;
 
-get_pipelines = (callback) => {
+get_pipelines = function (callback) {
 	request({
 		url: config.concourse_url + config.api_subdirectory + "/pipelines",
 		auth: {
@@ -25,7 +25,7 @@ get_pipelines = (callback) => {
 		},
 		json: true,
 		strictSSL: false
-	}, (error, response, body) => {
+	}, function (error, response, body) {
 		if (!error && response.statusCode === 200) {
 			pipelines = body;
 			callback();
@@ -35,13 +35,13 @@ get_pipelines = (callback) => {
 	});
 }
 
-get_pipeline_statuses = () => {
-	for (pipeline of pipelines) {
+get_pipeline_statuses = function () {
+	_.forEach(pipelines, function (pipeline) {
 		request({
 			url: config.concourse_url + config.api_subdirectory + pipeline.url + "/jobs",
 			json: true,
 			strictSSL: false
-		}, (error, response, body) => {
+		}, function (error, response, body) {
 			if (!error && response.statusCode === 200) {
 				for (task of body) {
 					if(task.finished_build !== undefined && task.finished_build !== null) {
@@ -59,10 +59,10 @@ setInterval(function() {
 	get_pipelines(get_pipeline_statuses);
 }, 5000);
 
-app.get('/', (req, res) => {
+app.get('/', function (req, res) {
 	res.render('overview', { config: config, pipelines: pipelines });
 });
 
-app.listen(app.get('port'), () => {
+app.listen(app.get('port'), function () {
 	console.log('running on port', app.get('port'));
 });
