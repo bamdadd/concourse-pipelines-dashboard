@@ -43,7 +43,7 @@ get_pipeline_statuses = function () {
 			strictSSL: false
 		}, function (error, response, body) {
 			if (!error && response.statusCode === 200) {
-				for (task of body) {
+				_.forEach(body, function(task) {
 					if(task.finished_build !== undefined && task.finished_build !== null) {
 						var index = _.findIndex(pipelines, { 'name': task.finished_build.pipeline_name });
 						if(pipelines[index]["status"] === undefined || pipelines[index]["status"] === "succeeded")
