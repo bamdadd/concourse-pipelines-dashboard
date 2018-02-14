@@ -3,10 +3,15 @@ config.concourse_url  = "http://product-concourse.prod.transit.ri-tech.io"; //Re
 config.api_subdirectory = "/api/v1";
 config.concourse_username = "";
 config.concourse_password = "";
-config.healthcheck_environment_urls = [{
-  name: "dev",
-  url: "http://product-dev-alb.dev.transit.ri-tech.io/injector-api/healthcheck"
-},
+config.healthcheck_environment_urls = [
+  {
+    name: "dev",
+    url: "http://product-dev-alb.dev.transit.ri-tech.io/injector-api/healthcheck"
+  },
+  {
+    name: "staging",
+    url: "http://product-staging-alb.dev.transit.ri-tech.io/injector-api/healthcheck"
+  },
   {
     name: "prod",
     url: "http://product-prod-alb.prod.transit.ri-tech.io/injector-api/healthcheck"
