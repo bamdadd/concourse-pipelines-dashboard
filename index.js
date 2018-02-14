@@ -49,10 +49,10 @@ get_pipeline_statuses = function () {
 						if(pipelines[index]["status"] === undefined || pipelines[index]["status"] === "succeeded")
 							pipelines[index]["status"] = task.finished_build.status;
 					}
-				}
+				})
 			}
 		});
-	}
+	})
 }
 
 setInterval(function() {
