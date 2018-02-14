@@ -15,6 +15,25 @@ app.use(bodyParser.json());
 
 
 var pipelines;
+var environments = [];
+
+get_health_for_environments = function (callback) {
+	environments = []
+  var environment_urls = config.healthcheck_environment_urls;
+	_.forEach(environment_urls, function (env, index) {
+			request({ url: env.url, json: true, strictSSL: false }, function (error, response, body) {
+				if( !error && response.statusCode === 200) {
+					body.healthchecks.forEach(function (service) {
+						service.status = service.isHealthy ? "healthy" : "unhealthy";
+						service.name = env.name + " " + service.service;
+					});
+					body.status = body.isHealthy ? "healthy" : "unhealthy";
+					environments[index] = body;
+				}
+			})
+	})
+
+}
 
 get_pipelines = function (callback) {
 	request({
@@ -57,10 +76,11 @@ get_pipeline_statuses = function () {
 
 setInterval(function() {
 	get_pipelines(get_pipeline_statuses);
+	get_health_for_environments()
 }, 5000);
 
 app.get('/', function (req, res) {
-	res.render('overview', { config: config, pipelines: pipelines });
+	res.render('overview', { config: config, pipelines: pipelines, environments: environments });
 });
 
 app.listen(app.get('port'), function () {

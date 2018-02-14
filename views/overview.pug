@@ -10,7 +10,14 @@ html
 				each pipeline in pipelines
 					a(href=config.concourse_url + pipeline.url)
 						.pipeline(class=pipeline.status)=pipeline.name
+			hr
+			center
+				each environment in environments
+					each service in environment.healthchecks
+						a(href=config.concourse_url )
+							.pipeline(class=service.status)=service.name
+
 		.footer
-			|Last Updated: 
+			|Last Updated:
 			script(type='text/javascript').
 				document.write(new Date().toTimeString());
