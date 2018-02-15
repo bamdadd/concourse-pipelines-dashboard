@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 
-var pipelines;
+var pipelines = [];
 var environments = [];
 
 get_health_for_environments = function (callback) {
@@ -22,7 +22,7 @@ get_health_for_environments = function (callback) {
   var environment_urls = config.healthcheck_environment_urls;
 	_.forEach(environment_urls, function (env, index) {
 			request({ url: env.url, json: true, strictSSL: false }, function (error, response, body) {
-				if( !error && response.statusCode === 200) {
+				if( !error && response.statusCode === 200 && body.healthchecks) {
 					body.healthchecks.forEach(function (service) {
 						service.status = service.isHealthy ? "healthy" : "unhealthy";
 						service.name = env.name + " " + service.service;
@@ -80,7 +80,7 @@ setInterval(function() {
 }, 5000);
 
 app.get('/', function (req, res) {
-	res.render('overview', { config: config, pipelines: pipelines, environments: environments });
+	res.render('overview', { config: config, pipelines: pipelines || [], environments: environments || [] });
 });
 
 app.listen(app.get('port'), function () {
