@@ -17,22 +17,31 @@ app.use(bodyParser.json());
 var pipelines = [];
 var environments = [];
 
-get_health_for_environments = function (callback) {
+const doRequest = (options) => new Promise((resolve, reject) => {
+	request(options, (error, response, body) => {
+		if (!error && response.statusCode === 200) {
+			resolve(body)
+		} else {
+			console.log(error, "somethig happened")
+			reject(error)
+		}
+	})
+})
+
+const get_health_for_environments =  () => {
 	environments = []
   var environment_urls = config.healthcheck_environment_urls;
-	_.forEach(environment_urls, function (env, index) {
-			request({ url: env.url, json: true, strictSSL: false }, function (error, response, body) {
-				if( !error && response.statusCode === 200 && body.healthchecks) {
-					body.healthchecks.forEach(function (service) {
-						service.status = service.isHealthy ? "healthy" : "unhealthy";
-						service.name = env.name + " " + service.service;
-					});
-					body.status = body.isHealthy ? "healthy" : "unhealthy";
-					environments[index] = body;
-				}
-			})
+	return Promise.all(environment_urls.map(env => {
+		const options = { url: env.url, json: true, strictSSL: false }
+		return doRequest(options)
+	})).then((environments) => {
+		return environments.map((environment, index) => ({
+			healthchecks: (environment.healthchecks || []).map( service => (
+				{ status: service.isHealthy ? "healthy" : "unhealthy", name: `${environment_urls[index].name} ${service.service}`}
+			)),
+			status: environment.isHealthy ? "healthy" : "unhealthy"
+		}))
 	})
-
 }
 
 get_pipelines = function (callback) {
@@ -77,6 +86,10 @@ get_pipeline_statuses = function () {
 setInterval(function() {
 	get_pipelines(get_pipeline_statuses);
 	get_health_for_environments()
+		.then(results => {
+			environments.splice(0)
+			results.forEach(item => environments.push(item))
+		})
 }, 5000);
 
 app.get('/', function (req, res) {
