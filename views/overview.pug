@@ -17,7 +17,14 @@ html
 						a(href=config.concourse_url )
 							.pipeline(class=service.status)=service.name
 
+
 		.footer
 			|Last Updated:
 			script(type='text/javascript').
 				document.write(new Date().toTimeString());
+		iframe(id="iframe" sandbox='allow-same-origin' style='display: none')
+		.ip
+			|
+			script(type='text/javascript' src='/js/ip.js').
+			.ip-value(id='ip-value')
+				ul

@@ -52,3 +52,8 @@ body {
 .failed, .unhealthy {
 	background-color: #E74C3C ;
 }
+
+.ip-value ul{
+	font-size: 4em;
+	list-style-type: none;
+}
